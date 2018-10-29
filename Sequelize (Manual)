@@ -1,0 +1,66 @@
+Sequelize (Manual)
+- biblioteca para trabalhar com SQL em JavaScript
+
+Criar uma pasta
+npm init
+npm install --save sequelize
+npm install --save sequelize-cli
+npm install --save sqlite3
+node_modules/.bin/sequelize init
+node_modules/.bin/sequelize model:generate --name Author --attributes name:string
+
+ATUALIZAR ARQUIVO CONFIG:
+"development": { 
+    "storage": "myFile.sqlite",
+    "dialect": "sqlite"
+  }
+
+node_modules/.bin/sequelize db:migrate
+
+*INSERT TO:
+node
+> const db = require('./models/index');
+> db.Author
+> db.Author.create({name: 'Daniel Cukier'})
+
+*FIND:
+node
+> db.Author.findById(3).then(a => console.log(a));
+> db.Author.findAll({ where: { name: 'Harry Potter' } }).then(a => {console.log(a)})
+> db.Author.findAll({ where: { name: {like: '%a%'} } }).then(a => {console.log(a)})
+> db.Author.findAll({ where: { id: [1,2,3] } }).then(a => {console.log(a)})
+
+*UPDATE dados:
+node
+> db.Author.findById(3).then(a.update => {name: 'Harry Potter 2'})
+
+*UPDATE TABLE:
+node_modules/.bin/sequelize migration:create --name PagesToBooks
+
+ATUALIZAR ARQUIVO NA PASTA 'migrations':
+  up: (queryInterface, Sequelize) => {
+    queryInterface.addColumn (
+      'Books',
+      'pages',
+      Sequelize.STRING
+    )
+  },
+
+  down: (queryInterface, Sequelize) => {
+    queryInterface.removeColumn('Books', 'pages')
+  }
+
+node_modules/.bin/sequelize db:migrate
+
+
+*COUNT:
+node
+> db.Author.count().then(c => console.log(c))
+
+*SUM:
+node
+> db.Books.sum('pages').then(p => console.log(p))
+
+*One-To-Many associations (hasMany):
+node
+> db.Book.findById(5).then(books => {db.Author.findById(2).then(a => {a.addBooks(books);})})
